@@ -407,8 +407,8 @@ else # ifeq Linux
 
 ifeq ($(PLATFORM),gcw0)
 
-  SYSROOT = $(shell $(CC) --print-sysroot)
   CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
+  SYSROOT = $(shell $(CC) --print-sysroot)
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -pipe -DUSE_ICON -fsigned-char \
     -ftree-vectorize -fsingle-precision-constant
