@@ -416,7 +416,7 @@ ifeq ($(PLATFORM),gcw0)
   CLIENT_CFLAGS = $(SDL_CFLAGS) -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/GLES
   SERVER_CFLAGS =
   USE_LOCAL_HEADERS = 
-  HAVE_VM_COMPILED = true
+  HAVE_VM_COMPILED = false
   
   ifeq ($(USE_OPENAL),1)
     CLIENT_CFLAGS += -DUSE_OPENAL
