@@ -8,8 +8,8 @@ COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 
 
 COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/x86/)
 
-COMPILE_PLATFORM=pandora
-COMPILE_ARCH=arm
+COMPILE_PLATFORM=gcw0
+COMPILE_ARCH=mips
 
 ifeq ($(COMPILE_PLATFORM),sunos)
   # Solaris uname and GNU uname differ
@@ -400,6 +400,98 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
   endif
   endif
 else # ifeq Linux
+
+#############################################################################
+# SETUP AND BUILD -- GCW Zero
+#############################################################################
+
+ifeq ($(PLATFORM),gcw0)
+
+  SYSROOT = $(shell $(CC) --print-sysroot)
+  CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
+  BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
+    -pipe -DUSE_ICON -fsigned-char \
+    -ftree-vectorize -fsingle-precision-constant
+  SDL_CFLAGS = $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
+  CLIENT_CFLAGS = $(SDL_CFLAGS) -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/GLES
+  SERVER_CFLAGS =
+  USE_LOCAL_HEADERS = 
+  HAVE_VM_COMPILED = true
+  
+  ifeq ($(USE_OPENAL),1)
+    CLIENT_CFLAGS += -DUSE_OPENAL
+    ifeq ($(USE_OPENAL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
+    endif
+  endif
+
+  ifeq ($(USE_CURL),1)
+    CLIENT_CFLAGS += -DUSE_CURL
+    ifeq ($(USE_CURL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_CURL_DLOPEN
+    endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
+  endif
+
+  OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
+  OPTIMIZE = $(OPTIMIZEVM) -ffast-math
+  #HAVE_VM_COMPILED=
+
+  ifneq ($(HAVE_VM_COMPILED),true)
+    BASE_CFLAGS += -DNO_VM_COMPILED
+  endif
+
+  SHLIBEXT=so
+  SHLIBCFLAGS=-fPIC -fvisibility=hidden
+  SHLIBLDFLAGS=-shared $(LDFLAGS)
+
+  THREAD_LIBS=-lpthread
+  LIBS=-ldl -lm
+
+  SDL_LIBS = $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
+  CLIENT_LIBS=$(SDL_LIBS) -lGLESv1_CM -lEGL
+
+  ifeq ($(USE_OPENAL),1)
+    ifneq ($(USE_OPENAL_DLOPEN),1)
+      CLIENT_LIBS += -lopenal
+    endif
+  endif
+
+  ifeq ($(USE_CURL),1)
+    ifneq ($(USE_CURL_DLOPEN),1)
+      CLIENT_LIBS += -lcurl
+    endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+#Sago: Here I get vorbis to compile in Windows:
+    ifeq ($(PLATFORM),mingw32)
+      CLIENT_LIBS += $(LIBSDIR)/win32/libvorbisfile.a $(LIBSDIR)/win32/libvorbis.a $(LIBSDIR)/win32/libogg.a
+    else
+      CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+    endif
+  endif
+
+  ifeq ($(USE_MUMBLE),1)
+    CLIENT_LIBS += -lrt
+  endif
+
+  ifeq ($(USE_LOCAL_HEADERS),1)
+    CLIENT_CFLAGS += -I$(SDLHDIR)/include
+  endif
+  
+  #No gles2 for now.
+  BUILD_RENDERER_OPENGL2=0
+
+  #I have problem with the Opus codec compilation, disable for now...
+  #USE_CODEC_OPUS=0
+  
+  BASE_CFLAGS += -DGCW0 -DHAVE_GLES
+
+else # ifeq gcw0
 
 #############################################################################
 # SETUP AND BUILD -- PANDORA
@@ -980,6 +1072,7 @@ else # ifeq sunos
   SHLIBLDFLAGS=-shared
 
 endif #Linux
+endif #gcw0
 endif #pandora
 endif #darwin
 endif #mingw32
@@ -1804,6 +1897,11 @@ ifneq ($(USE_RENDERER_DLOPEN), 0)
 endif
 
 ifeq ($(ARCH),arm)
+Q3ROBJ += \
+	$(B)/renderergl1/eglport.o
+endif
+
+ifeq ($(COMPILE_PLATFORM),gcw0)
 Q3ROBJ += \
 	$(B)/renderergl1/eglport.o
 endif
