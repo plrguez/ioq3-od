@@ -27,8 +27,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __QGL_H__
 
 #ifdef HAVE_GLES
-#include <SDL_opengles.h>
+#if defined(GCW0)
+#	include <GLES/gl.h>
+#	include <GLES/glext.h>
+#else
+#	include <SDL_opengles.h>
+#endif
 #include <EGL/egl.h>
+#ifndef APIENTRY
+#define APIENTRY
+#endif
 #ifndef APIENTRYP
 #define APIENTRYP APIENTRY *
 #endif

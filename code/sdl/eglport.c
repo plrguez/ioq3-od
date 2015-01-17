@@ -28,7 +28,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define USE_EGL_SDL 1
+#if !defined(GCW0)
+#define USE_EGL_SDL	1
+#endif
 #define USE_GLES1	1
 
 #if defined(USE_EGL_SDL)

@@ -808,8 +808,10 @@ void Sys_GLimpInit( void )
 
 void Sys_SetFloatEnv(void)
 {
+#if !defined(GCW0)
 	// rounding toward nearest
 	fesetround(FE_TONEAREST);
+#endif
 }
 
 /*

@@ -414,7 +414,7 @@ ifeq ($(PLATFORM),gcw0)
     -ftree-vectorize -fsingle-precision-constant
   SDL_CFLAGS = $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
   CLIENT_CFLAGS = $(SDL_CFLAGS) -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/GLES
-  SERVER_CFLAGS =
+  SERVER_CFLAGS = -I$(SYSROOT)/usr/include
   USE_LOCAL_HEADERS = 
   HAVE_VM_COMPILED = false
   
