@@ -740,8 +740,10 @@ static void GLimp_InitExtensions( void )
 	}
 }
 
-#ifdef PANDORA
+#if defined(PANDORA)
 #define R_MODE_FALLBACK 11 // 800 * 480
+#elif defined(GCW0)
+#define R_MODE_FALLBACK 0 // 320 * 240
 #else
 #define R_MODE_FALLBACK 3 // 640 * 480
 #endif
