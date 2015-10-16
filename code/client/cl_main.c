@@ -86,6 +86,8 @@ cvar_t	*cl_mouseAccelOffset;
 cvar_t	*cl_mouseAccelStyle;
 cvar_t	*cl_showMouseRate;
 
+cvar_t *cl_joyAccel;
+
 cvar_t	*m_pitch;
 cvar_t	*m_yaw;
 cvar_t	*m_forward;
@@ -3474,6 +3476,8 @@ void CL_Init( void ) {
 
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
+	cl_joyAccel = Cvar_Get ("cl_joyAccel", "0.25", CVAR_ARCHIVE);
+
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
 #ifdef USE_CURL_DLOPEN
 	cl_cURLLib = Cvar_Get("cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE);
@@ -3510,11 +3514,11 @@ void CL_Init( void ) {
 	j_side =         Cvar_Get ("j_side",         "0.25", CVAR_ARCHIVE);
 	j_up =           Cvar_Get ("j_up",           "1", CVAR_ARCHIVE);
 
-	j_pitch_axis =   Cvar_Get ("j_pitch_axis",   "3", CVAR_ARCHIVE);
-	j_yaw_axis =     Cvar_Get ("j_yaw_axis",     "4", CVAR_ARCHIVE);
-	j_forward_axis = Cvar_Get ("j_forward_axis", "1", CVAR_ARCHIVE);
-	j_side_axis =    Cvar_Get ("j_side_axis",    "0", CVAR_ARCHIVE);
-	j_up_axis =      Cvar_Get ("j_up_axis",      "2", CVAR_ARCHIVE);
+	j_pitch_axis =   Cvar_Get ("j_pitch_axis",   "1", CVAR_ARCHIVE);
+	j_yaw_axis =     Cvar_Get ("j_yaw_axis",     "0", CVAR_ARCHIVE);
+	j_forward_axis = Cvar_Get ("j_forward_axis", "2", CVAR_ARCHIVE);
+	j_side_axis =    Cvar_Get ("j_side_axis",    "3", CVAR_ARCHIVE);
+	j_up_axis =      Cvar_Get ("j_up_axis",      "4", CVAR_ARCHIVE);
 
 	Cvar_CheckRange(j_pitch_axis, 0, MAX_JOYSTICK_AXIS-1, qtrue);
 	Cvar_CheckRange(j_yaw_axis, 0, MAX_JOYSTICK_AXIS-1, qtrue);

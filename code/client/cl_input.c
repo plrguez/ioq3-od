@@ -467,10 +467,13 @@ Joystick values stay set until changed
 =================
 */
 void CL_JoystickEvent( int axis, int value, int time ) {
+	float	accelSensitivity;
+
 	if ( axis < 0 || axis >= MAX_JOYSTICK_AXIS ) {
 		Com_Error( ERR_DROP, "CL_JoystickEvent: bad axis %i", axis );
 	}
-	cl.joystickAxis[axis] = value;
+	accelSensitivity = cl_joyAccel->value;
+	cl.joystickAxis[axis] = value * accelSensitivity;
 }
 
 /*
