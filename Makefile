@@ -413,7 +413,7 @@ ifeq ($(PLATFORM),gcw0)
     -pipe -DUSE_ICON -fsigned-char \
     -ftree-vectorize -fsingle-precision-constant
   SDL_CFLAGS = $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
-  CLIENT_CFLAGS = $(SDL_CFLAGS) -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/GLES
+  CLIENT_CFLAGS = $(SDL_CFLAGS) -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/GLES -I/buildroot/code/libcurl
   SERVER_CFLAGS = -I$(SYSROOT)/usr/include
   USE_LOCAL_HEADERS = 
   HAVE_VM_COMPILED = false
