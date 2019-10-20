@@ -1,0 +1,32 @@
+dpad
+
+  0x67 "up" Q:0x84(UPARROW) forward
++ 0x6c "down" Q:0x85(DOWNARROW) back
++ 0x69 "left" Q:0x86(LEFTARROW) left
++ 0x6a "right" Q:0x87(RIGHTARROW) right
+
+buttons  a, b, x, y
+
++ 0x1d "left ctrl" Q:0x89(CTRL) +attack
+  0x38 "left alt" Q:0x88(ALT) +moveup
++ 0x39 "space" Q:0x20(SPACE) U:0x20 sizeup
++ 0x2a "left shift" Q:0x8a(SHIFT) sizedown
+
+l1, r1, l2, r2
+
+  0x0f "tab" Q:0x09(TAB) U:0x09 -> +attack
++ 0x0e "backspace" Q:0x7f(BACKSPACE) U:0x7f -> +strafe
+  0x68 "page up" Q:0x8e(PGUP) -> weapprev
++ 0x6d "page down" Q:0x8d(PGDN) -> weapnext
+
+joy 1 click
+  0x53 "[.]" Q:0xab(KP_DEL) U:0x2e(.) -> centerview
+
+joy 2 click
++ 0x62 "[/]" Q:0xac(KP_SLASH) U:0x2f(/) -> +speed
+
+-------------------------------------
+
+^3WARNING: Failed to load sound sound/player/announce/UnnamedPlayer.wav!
+^3WARNING: Using default sound for sound/player/announce/UnnamedPlayer.wav
+
