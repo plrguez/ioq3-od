@@ -4,6 +4,7 @@
 # GNU Make required
 #
 
+#PLATFORM=x86
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
 COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/x86/)
@@ -321,6 +322,7 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
   CLIENT_CFLAGS += $(SDL_CFLAGS)
 
   OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
+
   OPTIMIZE = $(OPTIMIZEVM) -ffast-math
 
   ifeq ($(ARCH),x86_64)
@@ -411,7 +413,14 @@ ifeq ($(PLATFORM),gcw0)
   SYSROOT = $(shell $(CC) --print-sysroot)
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -pipe -DUSE_ICON -fsigned-char \
-    -ftree-vectorize -fsingle-precision-constant
+    -ftree-vectorize -fsingle-precision-constant \
+    -O3 \
+    -finline-functions \
+    -mips32r2 \
+    -fPIC \
+    -mplt \
+    -msym32
+
   SDL_CFLAGS = $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
   CLIENT_CFLAGS = $(SDL_CFLAGS) -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/GLES -I/buildroot/code/libcurl
   SERVER_CFLAGS = -I$(SYSROOT)/usr/include
