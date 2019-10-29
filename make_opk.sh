@@ -13,13 +13,13 @@ Exec=ioquake3.mips
 Terminal=false
 Type=Game
 StartupNotify=true
-Icon=quake
+Icon=quake3
 Categories=games;
 EOF
 
 # create opk
 FLIST="default.gcw0.desktop"
-FLIST="${FLIST} quake.png"
+FLIST="${FLIST} quake3.png"
 FLIST="${FLIST} build/release-gcw0-mips/ioquake3.mips"
 FLIST="${FLIST} build/release-gcw0-mips/ioq3ded.mips"
 FLIST="${FLIST} build/release-gcw0-mips/renderer_opengl1_mips.so"
