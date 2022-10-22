@@ -222,6 +222,29 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 	if ( r_allowResize->integer )
 		flags |= SDL_RESIZABLE;
 
+#ifdef OPENDINGUX
+        if (!EGL_Init_DRM( &glConfig.vidWidth, &glConfig.vidHeight ))
+        {
+		ri.Printf( PRINT_ALL, " Error initializing DRM\n" );
+		return RSERR_INVALID_MODE;
+        }
+        R_GetModeOD( glConfig.vidWidth, glConfig.vidHeight, &mode);
+
+        char buf[ MAX_STRING_CHARS ] = { 0 };
+        const char *newModeString = va( "%ux%u ", glConfig.vidWidth, glConfig.vidHeight );
+
+        if( strlen( newModeString ) < (int)sizeof( buf ) - strlen( buf ) )
+                Q_strcat( buf, sizeof( buf ), newModeString );
+        else
+                ri.Printf( PRINT_WARNING, "Skipping mode %ux%x, buffer too small\n", glConfig.vidWidth, glConfig.vidHeight );
+
+	if( *buf )
+	{
+		buf[ strlen( buf ) - 1 ] = 0;
+		ri.Printf( PRINT_ALL, "Available modes: '%s'\n", buf );
+		ri.Cvar_Set( "r_availableModes", buf );
+	}
+#else
 	if( videoInfo == NULL )
 	{
 		static SDL_VideoInfo sVideoInfo;
@@ -251,6 +274,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 					"Cannot estimate display aspect, assuming 1.333\n" );
 		}
 	}
+#endif
 
 	ri.Printf (PRINT_ALL, "...setting mode %d:", mode );
 
@@ -441,6 +465,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		}
 #endif
 
+#ifndef OPENDINGUX
 		SDL_WM_SetCaption(CLIENT_WINDOW_TITLE, CLIENT_WINDOW_MIN_TITLE);
 		SDL_ShowCursor(0);
 
@@ -449,6 +474,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 			ri.Printf( PRINT_DEVELOPER, "SDL_SetVideoMode failed: %s\n", SDL_GetError( ) );
 			continue;
 		}
+#endif
 
 #ifdef HAVE_GLES
 		EGL_Open(glConfig.vidWidth, glConfig.vidHeight);
@@ -472,6 +498,25 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 //	EGL_Open(glConfig.vidWidth, glConfig.vidHeight);
 	#endif
 
+#ifdef OPENDINGUX
+	if (!SDL_WasInit(SDL_INIT_VIDEO))
+	{
+		char driverName[ 64 ];
+
+		if (SDL_Init(SDL_INIT_VIDEO) == -1)
+		{
+			ri.Printf( PRINT_ALL, "SDL_Init( SDL_INIT_VIDEO ) FAILED (%s)\n",
+					SDL_GetError());
+			return RSERR_INVALID_MODE;
+		}
+
+		SDL_VideoDriverName( driverName, sizeof( driverName ) - 1 );
+		ri.Printf( PRINT_ALL, "SDL using driver \"%s\"\n", driverName );
+		ri.Cvar_Set( "r_sdlDriver", driverName );
+	}
+#endif
+
+#ifndef OPENDINGUX
 	GLimp_DetectAvailableModes();
 
 	if (!vidscreen)
@@ -481,6 +526,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 	}
 
 	screen = vidscreen;
+#endif
 
 	glstring = (char *) qglGetString (GL_RENDERER);
 	ri.Printf( PRINT_ALL, "GL_RENDERER: %s\n", glstring );
@@ -497,6 +543,7 @@ static qboolean GLimp_StartDriverAndSetMode(int mode, qboolean fullscreen, qbool
 {
 	rserr_t err;
 
+#ifndef OPENDINGUX
 	if (!SDL_WasInit(SDL_INIT_VIDEO))
 	{
 		char driverName[ 64 ];
@@ -512,6 +559,7 @@ static qboolean GLimp_StartDriverAndSetMode(int mode, qboolean fullscreen, qbool
 		ri.Printf( PRINT_ALL, "SDL using driver \"%s\"\n", driverName );
 		ri.Cvar_Set( "r_sdlDriver", driverName );
 	}
+#endif
 
 	if (fullscreen && ri.Cvar_VariableIntegerValue( "in_nograb" ) )
 	{
@@ -853,6 +901,7 @@ void GLimp_EndFrame( void )
 	}
 	#endif
 
+#ifndef OPENDINGUX
 	if( r_fullscreen->modified )
 	{
 		qboolean    fullscreen;
@@ -890,4 +939,5 @@ void GLimp_EndFrame( void )
 
 		r_fullscreen->modified = qfalse;
 	}
+#endif
 }

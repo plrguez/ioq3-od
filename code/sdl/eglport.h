@@ -29,6 +29,17 @@
 #include <stdint.h>
 #include "EGL/egl.h"
 
+#ifdef OPENDINGUX
+#include <EGL/eglext.h>
+
+#include <gbm.h>
+#include <libdrm/drm_fourcc.h>
+
+#include <libdrm/drm.h>
+#include <xf86drm.h>
+#include <xf86drmMode.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,6 +60,7 @@ extern "C" {
 
 /** Public API */
 void    EGL_Close                   ( void );
+int8_t  EGL_Init_DRM                ( uint16_t *width, uint16_t *height );
 int8_t  EGL_Open                    ( uint16_t width, uint16_t height );
 void    EGL_SwapBuffers             ( void );
 

@@ -12,6 +12,10 @@ COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/x86/)
 COMPILE_PLATFORM=gcw0
 COMPILE_ARCH=mips
 
+ifndef OD_BETA
+  OD_BETA = 1
+endif
+
 ifeq ($(COMPILE_PLATFORM),sunos)
   # Solaris uname and GNU uname differ
   COMPILE_ARCH=$(shell uname -p | sed -e s/i.86/x86/)
@@ -412,7 +416,7 @@ ifeq ($(PLATFORM),gcw0)
   CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
   SYSROOT = $(shell $(CC) --print-sysroot)
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -pipe -DUSE_ICON -fsigned-char \
+    -pipe -fsigned-char \
     -ftree-vectorize -fsingle-precision-constant \
     -O3 \
     -finline-functions \
@@ -420,9 +424,15 @@ ifeq ($(PLATFORM),gcw0)
     -fPIC \
     -mplt \
     -msym32
+  ifeq ($(OD_BETA),0)
+    BASE_CFLAGS += -DUSE_ICON
+  endif
 
   SDL_CFLAGS = $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
   CLIENT_CFLAGS = $(SDL_CFLAGS) -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/GLES -I/buildroot/code/libcurl
+  ifeq ($(OD_BETA),1)
+    CLIENT_CFLAGS += -I$(SYSROOT)/usr/include/libdrm
+  endif
   SERVER_CFLAGS = -I$(SYSROOT)/usr/include
   USE_LOCAL_HEADERS = 
   HAVE_VM_COMPILED = false
@@ -462,6 +472,9 @@ ifeq ($(PLATFORM),gcw0)
 
   SDL_LIBS = $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
   CLIENT_LIBS=$(SDL_LIBS) -lGLESv1_CM -lEGL
+  ifeq ($(OD_BETA),1)
+    CLIENT_LIBS += -ldrm
+  endif
 
   ifeq ($(USE_OPENAL),1)
     ifneq ($(USE_OPENAL_DLOPEN),1)
@@ -499,6 +512,10 @@ ifeq ($(PLATFORM),gcw0)
   #USE_CODEC_OPUS=0
   
   BASE_CFLAGS += -DGCW0 -DHAVE_GLES
+
+  ifeq ($(OD_BETA),1)
+    BASE_CFLAGS += -DOPENDINGUX -DEGL_NO_X11
+  endif
 
 else # ifeq gcw0
 

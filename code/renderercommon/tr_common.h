@@ -115,6 +115,9 @@ extern cvar_t *r_stereoEnabled;
 
 extern	cvar_t	*r_saveFontData;
 
+#ifdef OPENDINGUX
+void R_GetModeOD( int width, int height, int *mode );
+#endif
 qboolean	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
 
 float R_NoiseGet4f( float x, float y, float z, float t );
