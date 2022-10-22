@@ -281,23 +281,24 @@ vidmode_t r_vidModes[] =
 	{ "Mode  9: 1600x1200",		1600,	1200,	1 },
 	{ "Mode 10: 2048x1536",		2048,	1536,	1 },
 	{ "Mode 11: 800x480 (pandora)", 800, 480,   1 },
-	{ "Mode 12: 856x480 (wide)",856,	480,	1 }
+	{ "Mode 12: 856x480 (wide)",856,	480,	1 },
+	{ "Mode 13: 320x480 (RG280)",   320,	480,	1 }
 };
 static int	s_numVidModes = ARRAY_LEN( r_vidModes );
 
 #ifdef OPENDINGUX
 void R_GetModeOD( int width, int height, int *mode ) {
-    int i;
-    
-    for (i = 0; i < s_numVidModes; i++)
-    {
-        if (r_vidModes[ i ].width == width && r_vidModes[ i ].height == height)
-        {
-            ri.Printf( PRINT_ALL, "Set video mode %i (%s), old mode %i (%s) \n", i, r_vidModes[i].description, *mode, r_vidModes[*mode].description );
-            *mode = i;
-            break;
-        }
-    }
+	int i;
+
+	for (i = 0; i < s_numVidModes; i++)
+	{
+		if (r_vidModes[ i ].width == width && r_vidModes[ i ].height == height)
+		{
+			ri.Printf( PRINT_ALL, "Set video mode %i (%s), old mode %i (%s) \n", i, r_vidModes[i].description, *mode, r_vidModes[*mode].description );
+			*mode = i;
+			break;
+		}
+	}
 }
 #endif
 

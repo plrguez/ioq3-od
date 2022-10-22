@@ -229,6 +229,12 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		return RSERR_INVALID_MODE;
         }
         R_GetModeOD( glConfig.vidWidth, glConfig.vidHeight, &mode);
+        // Guess the display aspect ratio through the desktop resolution
+        // by assuming (relatively safely) that it is set at or close to
+        // the display's native aspect ratio
+        displayAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+
+        ri.Printf( PRINT_ALL, "Estimated display aspect: %.3f\n", displayAspect );
 
         char buf[ MAX_STRING_CHARS ] = { 0 };
         const char *newModeString = va( "%ux%u ", glConfig.vidWidth, glConfig.vidHeight );
