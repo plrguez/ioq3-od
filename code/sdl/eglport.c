@@ -90,7 +90,7 @@ EGLContext          eglContext    = NULL;   /** Reference to the EGL context */
 EGLSurface          eglSurface    = NULL;   /** Reference to the EGL surface */
 
 #ifdef OPENDINGUX
-#define     totalConfigsIn 10                /** Total number of configurations to request */
+#define     totalConfigsIn 10               /** Total number of configurations to request */
 #else
 #define     totalConfigsIn 5                /** Total number of configurations to request */
 #endif
@@ -557,13 +557,7 @@ void EGL_SwapBuffers( void )
 int8_t EGL_Init_DRM( uint16_t *width, uint16_t *height )
 {
     unsigned int vrefresh = 0;
-    
     struct gbm *pgbm = &gbm;
-    
-    if (drm.fd) {
-        LOG("DRM already initialized\n");
-        return 1;
-    }
     
     init_drm(&drm, vrefresh);
     if (!drm.fd) {
