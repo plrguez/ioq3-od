@@ -160,7 +160,40 @@ static void GLimp_DetectAvailableModes(void)
 	int numModes;
 	int i;
 
+#ifdef OPENDINGUX
+	// Add 320x240, 640x480 modes and also 320x480 mode if we are on RG280
+	if ( glConfig.vidWidth == 320 && glConfig.vidHeight == 480 )
+		numModes = 3;
+	else
+		numModes = 2;
+	modes = malloc((numModes+1)*sizeof(SDL_Rect *));
+
+	i = 0;
+	modes[i] = malloc(sizeof(SDL_Rect));
+	modes[i]->w = 320;
+	modes[i]->h = 240;
+	modes[i]->x = 0;
+	modes[i]->y = 0;
+	i++;
+	if ( glConfig.vidWidth == 320 && glConfig.vidHeight == 480 )
+	{
+		modes[i] = malloc(sizeof(SDL_Rect));
+		modes[i]->w = 320;
+		modes[i]->h = 480;
+		modes[i]->x = 0;
+		modes[i]->y = 0;
+		i++;
+	}
+	modes[i] = malloc(sizeof(SDL_Rect));
+	modes[i]->w = 640;
+	modes[i]->h = 480;
+	modes[i]->x = 0;
+	modes[i]->y = 0;
+	i++;
+	modes[i] = NULL;
+#else
 	modes = SDL_ListModes( videoInfo->vfmt, SDL_OPENGL | SDL_FULLSCREEN );
+#endif
 
 	if( !modes )
 	{
@@ -195,6 +228,13 @@ static void GLimp_DetectAvailableModes(void)
 		ri.Printf( PRINT_ALL, "Available modes: '%s'\n", buf );
 		ri.Cvar_Set( "r_availableModes", buf );
 	}
+#ifdef OPENDINGUX
+	for( i = 0; i < numModes; i++ )
+	{
+		free(modes[i]);
+	}
+	free(modes);
+#endif
 }
 
 /*
@@ -210,7 +250,9 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 	int tcolorbits, tdepthbits, tstencilbits;
 	int samples;
 	int i = 0;
+#ifndef OPENDINGUX
 	SDL_Surface *vidscreen = NULL;
+#endif
 	#ifdef HAVE_GLES
 	Uint32 flags = 0;
 	#else
@@ -223,33 +265,18 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		flags |= SDL_RESIZABLE;
 
 #ifdef OPENDINGUX
-        if (!EGL_Init_DRM( &glConfig.vidWidth, &glConfig.vidHeight ))
-        {
+	if (!EGL_Init_DRM( (uint16_t *)&glConfig.vidWidth, (uint16_t *)&glConfig.vidHeight ))
+	{
 		ri.Printf( PRINT_ALL, " Error initializing DRM\n" );
 		return RSERR_INVALID_MODE;
-        }
-        R_GetModeOD( glConfig.vidWidth, glConfig.vidHeight, &mode);
-        // Guess the display aspect ratio through the desktop resolution
-        // by assuming (relatively safely) that it is set at or close to
-        // the display's native aspect ratio
-        displayAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
-
-        ri.Printf( PRINT_ALL, "Estimated display aspect: %.3f\n", displayAspect );
-
-        char buf[ MAX_STRING_CHARS ] = { 0 };
-        const char *newModeString = va( "%ux%u ", glConfig.vidWidth, glConfig.vidHeight );
-
-        if( strlen( newModeString ) < (int)sizeof( buf ) - strlen( buf ) )
-                Q_strcat( buf, sizeof( buf ), newModeString );
-        else
-                ri.Printf( PRINT_WARNING, "Skipping mode %ux%x, buffer too small\n", glConfig.vidWidth, glConfig.vidHeight );
-
-	if( *buf )
-	{
-		buf[ strlen( buf ) - 1 ] = 0;
-		ri.Printf( PRINT_ALL, "Available modes: '%s'\n", buf );
-		ri.Cvar_Set( "r_availableModes", buf );
 	}
+        R_GetModeOD( glConfig.vidWidth, glConfig.vidHeight, &mode);
+	// Guess the display aspect ratio through the desktop resolution
+	// by assuming (relatively safely) that it is set at or close to
+	// the display's native aspect ratio
+	displayAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+
+	ri.Printf( PRINT_ALL, "Estimated display aspect: %.3f\n", displayAspect );
 #else
 	if( videoInfo == NULL )
 	{
@@ -522,9 +549,8 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 	}
 #endif
 
-#ifndef OPENDINGUX
 	GLimp_DetectAvailableModes();
-
+#ifndef OPENDINGUX
 	if (!vidscreen)
 	{
 		ri.Printf( PRINT_ALL, "Couldn't get a visual\n" );
