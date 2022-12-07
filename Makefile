@@ -418,7 +418,6 @@ ifeq ($(PLATFORM),gcw0)
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -pipe -fsigned-char \
     -ftree-vectorize -fsingle-precision-constant \
-    -O3 \
     -finline-functions \
     -mips32r2 \
     -fPIC \
