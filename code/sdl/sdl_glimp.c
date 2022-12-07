@@ -161,32 +161,11 @@ static void GLimp_DetectAvailableModes(void)
 	int i;
 
 #ifdef OPENDINGUX
-	// Add 320x240, 640x480 modes and also 320x480 mode if we are on RG280
-	if ( glConfig.vidWidth == 320 && glConfig.vidHeight == 480 )
-		numModes = 3;
-	else
-		numModes = 2;
-	modes = malloc((numModes+1)*sizeof(SDL_Rect *));
-
+	modes = malloc(2*sizeof(SDL_Rect *));
 	i = 0;
 	modes[i] = malloc(sizeof(SDL_Rect));
-	modes[i]->w = 320;
-	modes[i]->h = 240;
-	modes[i]->x = 0;
-	modes[i]->y = 0;
-	i++;
-	if ( glConfig.vidWidth == 320 && glConfig.vidHeight == 480 )
-	{
-		modes[i] = malloc(sizeof(SDL_Rect));
-		modes[i]->w = 320;
-		modes[i]->h = 480;
-		modes[i]->x = 0;
-		modes[i]->y = 0;
-		i++;
-	}
-	modes[i] = malloc(sizeof(SDL_Rect));
-	modes[i]->w = 640;
-	modes[i]->h = 480;
+	modes[i]->w = glConfig.vidWidth;
+	modes[i]->h = glConfig.vidHeight;
 	modes[i]->x = 0;
 	modes[i]->y = 0;
 	i++;
@@ -265,16 +244,19 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		flags |= SDL_RESIZABLE;
 
 #ifdef OPENDINGUX
-	if (!EGL_Init_DRM( (uint16_t *)&glConfig.vidWidth, (uint16_t *)&glConfig.vidHeight ))
+	static SDL_VideoInfo sVideoInfo;
+	if (!EGL_Init_DRM( (uint16_t *)&sVideoInfo.current_w, (uint16_t *)&sVideoInfo.current_h ))
 	{
 		ri.Printf( PRINT_ALL, " Error initializing DRM\n" );
 		return RSERR_INVALID_MODE;
 	}
-        R_GetModeOD( glConfig.vidWidth, glConfig.vidHeight, &mode);
+	if( videoInfo == NULL )
+		videoInfo = &sVideoInfo;
+
 	// Guess the display aspect ratio through the desktop resolution
 	// by assuming (relatively safely) that it is set at or close to
 	// the display's native aspect ratio
-	displayAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+	displayAspect = (float)videoInfo->current_w / (float)videoInfo->current_h;
 
 	ri.Printf( PRINT_ALL, "Estimated display aspect: %.3f\n", displayAspect );
 #else

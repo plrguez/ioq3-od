@@ -332,6 +332,9 @@ static const char *builtinResolutions[ ] =
 	"1600x1200",
 	"2048x1536",
 	"856x480",
+#ifdef OPENDINGUX
+	"320x480",
+#endif
 	NULL
 };
 
@@ -344,6 +347,9 @@ static const char *knownRatios[ ][2] =
 	{ "1.60:1", "16:10" },
 	{ "1.67:1", "5:3"   },
 	{ "1.78:1", "16:9"  },
+#ifdef OPENDINGUX
+	{ "0.67:1", "2:3"  },
+#endif
 	{ NULL    , NULL    }
 };
 
