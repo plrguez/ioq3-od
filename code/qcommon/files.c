@@ -3247,9 +3247,14 @@ static void FS_Startup( const char *gameName )
 	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 
 	// add search path elements in reverse priority order
+#ifndef OPENDINGUX
 	if (fs_basepath->string[0]) {
 		FS_AddGameDirectory( fs_basepath->string, gameName );
 	}
+#else
+        // SDCard
+	FS_AddGameDirectory ( "/media/sdcard/Quake3/", gameName );
+#endif
 	// fs_homepath is somewhat particular to *nix systems, only add if relevant
 
 #ifdef MACOS_X
@@ -3284,6 +3289,13 @@ static void FS_Startup( const char *gameName )
 			FS_AddGameDirectory(fs_homepath->string, fs_gamedirvar->string);
 		}
 	}
+
+#ifdef OPENDINGUX
+	// add search path in mount opk directory first to search shared libraries
+	if (fs_basepath->string[0]) {
+		FS_AddGameDirectory( fs_basepath->string, gameName );
+	}
+#endif
 
 #ifndef STANDALONE
 	if(!com_standalone->integer)
